@@ -1,372 +1,375 @@
+/* =============================================
+   VARIABLES CSS (:root)
+   ============================================= */
 :root {
-    --color-primario: #1e3a8a;
-    --color-primario-claro: #3b82f6;
-    --color-fondo: #f1f5f9;
-    --color-tarjeta: #ffffff;
-    --color-texto: #1e293b;
-    --color-borde: #e2e8f0;
-
-    --color-entregado: #16a34a;
-    --color-en-transito: #2563eb;
-    --color-pendiente: #d97706;
-    --color-cancelado: #dc2626;
+    --primary-color: #0284c7;
+    --primary-dark: #0369a1;
+    --bg-dark: #0f172a;
+    --bg-card: #1e293b;
+    --bg-card-hover: #263449;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent-success: #22c55e;
+    --accent-warning: #eab308;
+    --accent-danger: #ef4444;
+    --border-color: #334155;
+    --font-family: 'Inter', system-ui, sans-serif;
+    --radius: 8px;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* =============================================
+   RESET Y BASE
+   ============================================= */
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    margin: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: var(--color-fondo);
-    color: var(--color-texto);
+    font-family: var(--font-family);
+    background: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.5;
 }
 
-/* ===== Header con Flexbox ===== */
-.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--color-primario);
-    color: white;
-    padding: 1rem 2rem;
+a {
+    color: var(--primary-color);
 }
 
-.app-header .logo {
-    font-size: 1.4rem;
-    font-weight: bold;
-}
-
-.main-nav a {
-    color: white;
-    text-decoration: none;
-    margin-left: 1.5rem;
-    font-weight: 500;
-}
-
-.main-nav a:hover {
-    text-decoration: underline;
-}
-
-/* ===== Layout principal ===== */
-.app-main {
-    display: flex;
-    gap: 1.5rem;
-    padding: 1.5rem;
-    align-items: flex-start;
-}
-
-.filtros-panel {
-    flex: 0 0 280px;
-    background-color: var(--color-tarjeta);
-    border-radius: 10px;
-    padding: 1rem 1.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-.dashboard {
-    flex: 1;
-}
-
-/* ===== Filtros ===== */
-.filtros-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.filtro-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--color-borde);
-    background-color: white;
-    border-radius: 6px;
+button {
+    font-family: inherit;
     cursor: pointer;
-    text-align: left;
-    font-weight: 500;
 }
 
-.filtro-btn.activo {
-    background-color: var(--color-primario-claro);
-    color: white;
-    border-color: var(--color-primario-claro);
+input {
+    font-family: inherit;
 }
 
-/* ===== Formulario ===== */
-.form-nuevo-envio form {
+/* =============================================
+   FORMULARIOS (compartido entre login, nuevo envio, vehiculo)
+   ============================================= */
+form {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-}
-
-.form-nuevo-envio label {
-    font-size: 0.85rem;
-    font-weight: 600;
+    gap: 0.6rem;
     margin-top: 0.5rem;
 }
 
-.form-nuevo-envio input {
-    padding: 0.5rem;
-    border: 1px solid var(--color-borde);
-    border-radius: 6px;
-    font-size: 0.9rem;
+label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="date"] {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.55rem 0.7rem;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+input:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
 }
 
 .btn-primario {
-    margin-top: 1rem;
-    padding: 0.7rem;
-    background-color: var(--color-primario);
-    color: white;
+    background: var(--primary-color);
+    color: #fff;
     border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
+    border-radius: var(--radius);
+    padding: 0.65rem 1rem;
+    font-weight: 600;
+    margin-top: 0.4rem;
 }
 
 .btn-primario:hover {
-    background-color: var(--color-primario-claro);
+    background: var(--primary-dark);
+}
+
+.btn-secundario {
+    background: var(--bg-dark);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.9rem;
 }
 
 .mensaje-form {
-    margin-top: 0.6rem;
     font-size: 0.85rem;
+    margin-top: 0.4rem;
+    min-height: 1.2rem;
 }
 
 .mensaje-form.exito {
-    color: var(--color-entregado);
+    color: var(--accent-success);
 }
 
 .mensaje-form.error {
-    color: var(--color-cancelado);
-}
-
-/* ===== Grid de tarjetas con CSS Grid ===== */
-.envios-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
+    color: var(--accent-danger);
 }
 
 .cargando {
-    color: #64748b;
-    font-style: italic;
+    color: var(--text-muted);
+    padding: 1rem 0;
 }
 
-.envio-card {
-    background-color: var(--color-tarjeta);
-    border-radius: 10px;
-    padding: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+.texto-ayuda {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
 }
 
-.envio-card h3 {
-    margin: 0 0 0.3rem 0;
-    font-size: 1.05rem;
-}
-
-.envio-card p {
-    margin: 0;
-    font-size: 0.88rem;
-    color: #475569;
-}
-
-.envio-acciones {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.6rem;
-}
-
-.envio-acciones button {
-    flex: 1;
-    padding: 0.4rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: white;
-}
-
-.btn-transito {
-    background-color: var(--color-en-transito);
-}
-
-.btn-entregado {
-    background-color: var(--color-entregado);
-}
-
-/* ===== Pildoras de estado ===== */
-.pill-status {
-    display: inline-block;
-    padding: 0.2rem 0.7rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: white;
-    width: fit-content;
-}
-
-.pill-ENTREGADO {
-    background-color: var(--color-entregado);
-}
-
-.pill-EN_TRANSITO {
-    background-color: var(--color-en-transito);
-}
-
-.pill-PENDIENTE {
-    background-color: var(--color-pendiente);
-}
-
-.pill-CANCELADO {
-    background-color: var(--color-cancelado);
-}
-
-/* ===== Footer ===== */
-.app-footer {
-    text-align: center;
-    padding: 1rem;
-    color: #64748b;
-    font-size: 0.8rem;
-}
-
-/* ===== Responsivo ===== */
-@media (max-width: 768px) {
-    .app-main {
-        flex-direction: column;
-    }
-    .filtros-panel {
-        flex: 1 1 auto;
-        width: 100%;
-    }
-}
-/* ============ Login ============ */
+/* =============================================
+   VISTA 1: LOGIN (index.html)
+   ============================================= */
 .login-main {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    padding: 1rem;
 }
 
 .login-box {
-    background: #fff;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
     padding: 2.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
     width: 100%;
-    max-width: 360px;
+    max-width: 380px;
     text-align: center;
 }
 
-.login-box form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    text-align: left;
-    margin-top: 1rem;
+.logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
-/* ============ Header con info de usuario ============ */
+.login-box form {
+    text-align: left;
+}
+
+/* =============================================
+   VISTA 2: CONSOLA (dashboard.html)
+   ============================================= */
+
+/* Header */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+}
+
 .usuario-info {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-left: auto;
+    font-size: 0.9rem;
+    color: var(--text-muted);
 }
 
 .btn-logout {
-    background: #d9534f;
+    background: var(--accent-danger);
     color: #fff;
     border: none;
     padding: 0.4rem 0.9rem;
-    border-radius: 4px;
-    cursor: pointer;
+    border-radius: var(--radius);
 }
 
-.btn-bitacora {
-    background: #5b6b8c;
-    color: #fff;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-/* ============ Modal de Bitacora ============ */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
+/* Nav de filtros */
+.filtros-nav {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-.modal-overlay.oculto {
-    display: none;
-}
-
-.modal-contenido {
-    background: #fff;
-    border-radius: 8px;
-    padding: 1.5rem;
-    width: 90%;
-    max-width: 520px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.btn-cerrar-modal {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    line-height: 1;
-}
-
-.modal-filtros {
-    display: flex;
-    align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #eee;
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-dark);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.btn-secundario {
-    background: #eee;
-    border: none;
-    padding: 0.35rem 0.7rem;
-    border-radius: 4px;
-    cursor: pointer;
+.filtro-btn {
+    background: var(--bg-card);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
 }
 
-.bitacora-item {
-    border: 1px solid #eee;
-    border-radius: 6px;
-    padding: 0.75rem;
+.filtro-btn.activo {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+/* Layout principal: main + aside con Flexbox */
+.layout-principal {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.app-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+#asideAdmin {
+    flex: 0 0 280px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+}
+
+#asideAdmin h2 {
+    font-size: 1.05rem;
     margin-bottom: 0.75rem;
 }
 
-.bitacora-transicion {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+#asideAdmin h3 {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
 }
 
-.bitacora-flecha {
-    font-weight: bold;
+/* KPIs: CSS Grid adaptativa */
+#kpiSection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
 }
+
+.kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.kpi-card h2 {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.kpi-card p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Formulario de nuevo envio */
+#nuevoEnvioSection,
+#formVehiculo {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+}
+
+/* Grid de envios: CSS Grid adaptativa */
+#enviosGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.envio-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    transition: background 0.15s;
+}
+
+.envio-card:hover {
+    background: var(--bg-card-hover);
+}
+
+.envio-card h3 {
+    font-size: 1.05rem;
+}
+
+.pill-status {
+    display: inline-block;
+    width: fit-content;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+}
+
+.pill-PENDIENTE {
+    background: rgba(234, 179, 8, 0.15);
+    color: var(--accent-warning);
+}
+
+.pill-EN_TRANSITO {
+    background: rgba(2, 132, 199, 0.15);
+    color: var(--primary-color);
+}
+
+.pill-ENTREGADO {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--accent-success);
+}
+
+.pill-CANCELADO {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--accent-danger);
+}
+
+.envio-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.envio-acciones button {
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    color: #fff;
+}
+
+.btn-transito {
+    background: var(--primary-color);
+}
+
+.btn-entregado {
+    background: var(--accent-success);
+}
+
+.btn-bitacora {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+/* =============================================
+   MODAL DE
