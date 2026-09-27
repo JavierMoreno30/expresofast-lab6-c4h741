@@ -520,4 +520,136 @@ input:focus {
         flex-direction: column;
         align-items: stretch;
     }
+    /* =============================================
+   CONSOLA PAGINADA 
+   ============================================= */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+}
+
+.header-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.header-nav a:hover {
+    color: var(--text-main);
+}
+
+.app-main-paginado {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.filtros-paginado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.1rem;
+}
+
+.filtros-paginado > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.filtros-paginado select {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.6rem;
+    color: var(--text-main);
+}
+
+.filtros-botones {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px;
+}
+
+thead th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-color);
+}
+
+tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.paginador {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.paginador button {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: var(--radius);
+    padding: 0.45rem 0.9rem;
+}
+
+.paginador button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+#indicadorPagina {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .filtros-paginado {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtros-botones {
+        margin-left: 0;
+    }
+
+    .paginador {
+        flex-direction: column;
+    }
+}
 }

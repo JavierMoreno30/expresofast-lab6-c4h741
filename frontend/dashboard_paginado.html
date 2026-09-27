@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpresoFast - Consola Paginada</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">🚚 ExpresoFast</div>
+        <nav class="header-nav">
+            <a href="dashboard.html">Tablero Principal</a>
+        </nav>
+        <div class="usuario-info">
+            <span id="usuarioActual"></span>
+            <button id="btnLogout" class="btn-logout">Cerrar Sesion</button>
+        </div>
+    </header>
+
+    <main class="app-main-paginado">
+        <h1>Consola de Envios Paginada</h1>
+
+        <form id="formFiltrosPaginado" class="filtros-paginado" novalidate>
+            <div>
+                <label for="busquedaInput">Buscar</label>
+                <input type="search" id="busquedaInput" placeholder="Codigo o direccion...">
+            </div>
+
+            <div>
+                <label for="estadoSelect">Estado</label>
+                <select id="estadoSelect">
+                    <option value="">Todos</option>
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="EN_TRANSITO">En Transito</option>
+                    <option value="ENTREGADO">Entregado</option>
+                    <option value="CANCELADO">Cancelado</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="tamanoPaginaSelect">Envios por pagina</label>
+                <select id="tamanoPaginaSelect">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+
+            <div class="filtros-botones">
+                <button type="submit" class="btn-primario">Filtrar</button>
+                <button type="button" id="btnEjecutarSP" class="btn-secundario">Ejecutar Stored Procedure</button>
+            </div>
+        </form>
+
+        <div class="tabla-scroll">
+            <table>
+                <caption class="sr-only">Envios registrados en ExpresoFast</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Rastreo</th>
+                        <th scope="col">Direccion</th>
+                        <th scope="col">Flete</th>
+                        <th scope="col">Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaEnviosBody">
+                    <tr><td colspan="4" class="cargando">Cargando envios...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="paginador" aria-label="Paginacion de envios" id="paginadorNav">
+            <button id="btnPrimera" type="button">&laquo; Primera</button>
+            <button id="btnAnterior" type="button">&lsaquo; Anterior</button>
+            <span id="indicadorPagina" aria-live="polite">Pagina 1 de 1 (Total: 0 envios)</span>
+            <button id="btnSiguiente" type="button">Siguiente &rsaquo;</button>
+            <button id="btnUltima" type="button">Ultima &raquo;</button>
+        </nav>
+    </main>
+
+    <footer class="app-footer">
+        <p>ExpresoFast &copy; 2026 - Laboratorio 9, IF0009 Desarrollo de Software IV</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script src="paginado.js"></script>
+</body>
+</html>

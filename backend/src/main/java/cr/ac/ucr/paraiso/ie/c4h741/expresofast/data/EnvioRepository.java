@@ -14,7 +14,8 @@ import java.util.List;
 
 @Repository
 public interface EnvioRepository extends JpaRepository<Envio, Integer> {
-
+     //Recupera todos los envios junto con Vehiculo, EmpresaLogistica y Conductor
+     //en un unico viaje a la base de datos, evitando el fallo N+1 SELECT.
     @Query("""
             SELECT e FROM Envio e
             JOIN FETCH e.vehiculo v
@@ -23,6 +24,12 @@ public interface EnvioRepository extends JpaRepository<Envio, Integer> {
             """)
     List<Envio> findAllOptimizado();
 
+    /**
+     * Actualiza de forma masiva el estado de todos los envios
+     * asociados a un vehiculo especifico.
+     * clearAutomatically = true limpia el contexto de persistencia
+     * para evitar datos desactualizados en cache tras el UPDATE masivo.
+     */
     @Modifying(clearAutomatically = true)
     @Query("""
             UPDATE Envio e
@@ -32,8 +39,13 @@ public interface EnvioRepository extends JpaRepository<Envio, Integer> {
     int actualizarEstadoPorVehiculo(@Param("vehiculoId") Integer vehiculoId,
                                      @Param("estado") String estado);
 
-    Page<Envio> findByEstadoEnvio(String estadoEnvio, Pageable pageable);
 
+    //paginacion relacional y Stored Procedure
+Page<Envio> findByEstadoEnvio(String estadoEnvio, Pageable pageable);
+
+    
+     //Busqueda paginada por texto libre, en codigo de rastreo o direccion destino.
+     
     @Query("""
             SELECT e FROM Envio e
             WHERE LOWER(e.codigoRastreo) LIKE LOWER(CONCAT('%', :busqueda, '%'))
@@ -41,6 +53,8 @@ public interface EnvioRepository extends JpaRepository<Envio, Integer> {
             """)
     Page<Envio> buscarPaginado(@Param("busqueda") String busqueda, Pageable pageable);
 
+    
+     //Combina busqueda de texto libre con filtro de estado, paginado.
     @Query("""
             SELECT e FROM Envio e
             WHERE e.estadoEnvio = :estado
@@ -51,6 +65,11 @@ public interface EnvioRepository extends JpaRepository<Envio, Integer> {
                                           @Param("estado") String estado,
                                           Pageable pageable);
 
+    /**
+     * Invoca SP_OBTENER_ENVIOS_POR_ESTADO. El SP devuelve las columnas reales
+     * de la tabla (sin alias), por eso Hibernate puede mapear el resultado
+     * directamente a la entidad Envio.
+     */
     @Procedure(procedureName = "SP_OBTENER_ENVIOS_POR_ESTADO")
     List<Envio> spObtenerEnviosPorEstado(@Param("pEstado") String pEstado);
 }
