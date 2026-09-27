@@ -370,6 +370,154 @@ input:focus {
     border: 1px solid var(--border-color) !important;
     color: var(--text-main) !important;
 }
+  /* =============================================
+   MODAL DE BITÁCORA DE AUDITORÍA
+   ============================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-overlay.oculto {
+    display: none !important;
+}
+
+.modal-contenido {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 580px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.btn-cerrar {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.btn-cerrar:hover {
+    color: var(--text-main);
+}
+
+.filtros-fecha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+    background: var(--bg-dark);
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+.campo-fecha {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 130px;
+}
+
+.bitacora-contenedor {
+    overflow-y: auto;
+    max-height: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 0.3rem;
+}
+
+.bitacora-item {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.85rem;
+    font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.bitacora-transicion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+}
+
+.bitacora-flecha {
+    color: var(--text-muted);
+    font-weight: bold;
+}
+
+/* Footer de la App */
+.app-footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 2rem;
+}
 
 /* =============================================
-   MODAL DE
+   DISEÑO ADAPTATIVO (Media Queries Mobile-First)
+   ============================================= */
+@media (max-width: 768px) {
+    .layout-principal {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    #asideAdmin {
+        width: 100%;
+        flex: 1 1 auto;
+    }
+
+    .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .usuario-info {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .filtros-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 0.5rem;
+    }
+
+    .filtros-fecha {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

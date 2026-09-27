@@ -1,22 +1,18 @@
-// ===========================================================
-// ExpresoFast - Consumo asincrono de la API Spring Boot con JWT
-// ===========================================================
-
 const API_BASE_URL = 'http://localhost:8080/api';
 
 // -----------------------------------------------------------
-// Utilidades de sesion (localStorage)
+// Utilidades de sesion (sessionStorage: se borra al cerrar la pestaña)
 // -----------------------------------------------------------
 function getToken() {
-    return localStorage.getItem('jwt_token');
+    return sessionStorage.getItem('jwt_token');
 }
 
 function getUsername() {
-    return localStorage.getItem('jwt_username');
+    return sessionStorage.getItem('jwt_username');
 }
 
 function getRoles() {
-    const roles = localStorage.getItem('jwt_roles');
+    const roles = sessionStorage.getItem('jwt_roles');
     return roles ? JSON.parse(roles) : [];
 }
 
@@ -26,16 +22,16 @@ function tieneRol(...rolesPermitidos) {
 }
 
 function guardarSesion(token, username, roles) {
-    localStorage.setItem('jwt_token', token);
-    localStorage.setItem('jwt_username', username);
-    localStorage.setItem('jwt_roles', JSON.stringify(roles));
+    sessionStorage.setItem('jwt_token', token);
+    sessionStorage.setItem('jwt_username', username);
+    sessionStorage.setItem('jwt_roles', JSON.stringify(roles));
 }
 
 function cerrarSesion() {
-    localStorage.removeItem('jwt_token');
-    localStorage.removeItem('jwt_username');
-    localStorage.removeItem('jwt_roles');
-    window.location.href = 'login.html';
+    sessionStorage.removeItem('jwt_token');
+    sessionStorage.removeItem('jwt_username');
+    sessionStorage.removeItem('jwt_roles');
+    window.location.href = 'index.html';
 }
 
 // -----------------------------------------------------------
@@ -51,18 +47,37 @@ async function fetchWithAuth(url, options = {}) {
 
     const respuesta = await fetch(url, { ...options, headers });
 
-    if (respuesta.status === 401 || respuesta.status === 403) {
+   if (respuesta.status === 401) {
         cerrarSesion();
-        throw new Error('Sesion expirada. Por favor inicie sesion nuevamente.');
+        throw new Error('Sesión expirada. Por favor, inicie sesión nuevamente.');
+    }
+
+    if (respuesta.status === 403) {
+        //Lanza el error para que lo capture el catch() del formulario, pero no cierra la sesión
+        throw new Error('Acceso denegado: No tienes permisos para realizar esta acción.');
     }
 
     return respuesta;
 }
 
+// -----------------------------------------------------------
+// Extrae un mensaje legible del cuerpo de error que devuelve
+// GlobalExceptionHandler: {error, detalles?} (no es RFC 7807,
+// es el formato propio definido en el Lab 6/7 de este proyecto).
+// -----------------------------------------------------------
+function extraerMensajeError(datos) {
+    if (datos.detalles) {
+        return Object.entries(datos.detalles)
+            .map(([campo, mensaje]) => `${campo}: ${mensaje}`)
+            .join(' | ');
+    }
+    return datos.error || 'Ocurrio un error inesperado.';
+}
+
 // ===========================================================
-// LOGICA DE login.html
+// LOGICA DE index.html (Login)
 // ===========================================================
-const formLogin = document.getElementById('formLogin');
+const formLogin = document.getElementById('loginForm');
 
 if (formLogin) {
     const mensajeLogin = document.getElementById('mensajeLogin');
@@ -83,11 +98,11 @@ if (formLogin) {
             const datos = await respuesta.json();
 
             if (!respuesta.ok) {
-                throw new Error(datos.error || 'Usuario o contraseña incorrectos.');
+                throw new Error(extraerMensajeError(datos));
             }
 
             guardarSesion(datos.token, datos.username, datos.roles);
-            window.location.href = 'index.html';
+            window.location.href = 'dashboard.html';
         } catch (error) {
             mensajeLogin.textContent = error.message;
             mensajeLogin.className = 'mensaje-form error';
@@ -96,15 +111,14 @@ if (formLogin) {
 }
 
 // ===========================================================
-// LOGICA DE index.html
+// LOGICA DE dashboard.html (Consola de Operacion)
 // ===========================================================
 const enviosGrid = document.getElementById('enviosGrid');
 
 if (enviosGrid) {
 
-    // Si no hay token, redirigir de inmediato al login
     if (!getToken()) {
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     }
 
     let enviosCache = [];
@@ -116,7 +130,14 @@ if (enviosGrid) {
     const mensajeForm = document.getElementById('mensajeForm');
     const usuarioActual = document.getElementById('usuarioActual');
     const btnLogout = document.getElementById('btnLogout');
-    const seccionNuevoEnvio = document.getElementById('nuevo-envio');
+    const nuevoEnvioSection = document.getElementById('nuevoEnvioSection');
+    const asideAdmin = document.getElementById('asideAdmin');
+    const formVehiculo = document.getElementById('formVehiculo');
+    const mensajeVehiculo = document.getElementById('mensajeVehiculo');
+
+    const kpiTotalEnvios = document.getElementById('kpiTotalEnvios');
+    const kpiVehiculosActivos = document.getElementById('kpiVehiculosActivos');
+    const kpiPaquetesEntregados = document.getElementById('kpiPaquetesEntregados');
 
     const modalBitacora = document.getElementById('modalBitacora');
     const modalBitacoraTitulo = document.getElementById('modalBitacoraTitulo');
@@ -127,21 +148,49 @@ if (enviosGrid) {
     const btnLimpiarFiltroFecha = document.getElementById('btnLimpiarFiltroFecha');
 
     // -----------------------------------------------------------
-    // Inicializar interfaz segun el usuario y su rol
+    // Inicializar interfaz segun el rol del usuario autenticado
     // -----------------------------------------------------------
     function inicializarInterfazSegunRol() {
         usuarioActual.textContent = `${getUsername()} (${getRoles().join(', ')})`;
 
-        // ROLE_CONDUCTOR: ocultar formulario de creacion de envios
-        if (tieneRol('ROLE_CONDUCTOR') && !tieneRol('ROLE_ADMIN', 'ROLE_OPERADOR')) {
-            seccionNuevoEnvio.style.display = 'none';
+        // Solo ADMIN y OPERADOR pueden crear envios (POST /api/envios en el backend)
+        if (!tieneRol('ROLE_ADMIN', 'ROLE_OPERADOR')) {
+            nuevoEnvioSection.hidden = true;
+        }
+
+        // Solo ADMIN ve el panel lateral (bitacora + registro de vehiculos)
+        if (tieneRol('ROLE_ADMIN')) {
+            asideAdmin.hidden = false;
+            cargarVehiculosActivos();
+        } else {
+            asideAdmin.hidden = true;
+            kpiVehiculosActivos.textContent = '—';
         }
     }
 
     btnLogout.addEventListener('click', cerrarSesion);
 
     // -----------------------------------------------------------
-    // Cargar envios desde el backend (GET /api/envios/optimizados)
+    // KPIs
+    // -----------------------------------------------------------
+    function actualizarKpis() {
+        kpiTotalEnvios.textContent = enviosCache.length;
+        kpiPaquetesEntregados.textContent = enviosCache.filter(e => e.estadoEnvio === 'ENTREGADO').length;
+    }
+
+    async function cargarVehiculosActivos() {
+        try {
+            const respuesta = await fetchWithAuth(`${API_BASE_URL}/vehiculos`);
+            if (!respuesta.ok) return;
+            const vehiculos = await respuesta.json();
+            kpiVehiculosActivos.textContent = vehiculos.filter(v => v.estado === 'DISPONIBLE').length;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // -----------------------------------------------------------
+    // Cargar envios (GET /api/envios/optimizados)
     // -----------------------------------------------------------
     async function cargarEnvios() {
         try {
@@ -153,6 +202,7 @@ if (enviosGrid) {
             }
 
             enviosCache = await respuesta.json();
+            actualizarKpis();
             renderizarEnvios();
         } catch (error) {
             enviosGrid.innerHTML = `<p class="cargando">No se pudo conectar con el servidor: ${error.message}</p>`;
@@ -161,7 +211,7 @@ if (enviosGrid) {
     }
 
     // -----------------------------------------------------------
-    // Renderizar tarjetas segun el filtro activo y el rol
+    // Renderizar tarjetas <article> segun filtro y rol
     // -----------------------------------------------------------
     function renderizarEnvios() {
         const enviosFiltrados = filtroActual === 'TODOS'
@@ -173,7 +223,10 @@ if (enviosGrid) {
             return;
         }
 
-        const mostrarBotonBitacora = tieneRol('ROLE_ADMIN', 'ROLE_OPERADOR');
+        // Botones de cambio de estado: solo ADMIN y CONDUCTOR pueden
+        // ejecutar PATCH /api/envios/{id}/estado segun la matriz RBAC del backend.
+        const puedeCambiarEstado = tieneRol('ROLE_ADMIN', 'ROLE_CONDUCTOR');
+        const puedeVerBitacora = tieneRol('ROLE_ADMIN', 'ROLE_OPERADOR');
 
         enviosGrid.innerHTML = enviosFiltrados.map(envio => `
             <article class="envio-card" data-id="${envio.id}">
@@ -185,9 +238,9 @@ if (enviosGrid) {
                 <p><strong>Vehiculo:</strong> ${envio.placaVehiculo || 'N/A'}</p>
                 <p><strong>Conductor:</strong> ${envio.nombreConductor || 'N/A'}</p>
                 <div class="envio-acciones">
-                    <button class="btn-transito" onclick="cambiarEstado(${envio.id}, 'EN_TRANSITO')">Marcar en Transito</button>
-                    <button class="btn-entregado" onclick="cambiarEstado(${envio.id}, 'ENTREGADO')">Marcar Entregado</button>
-                    ${mostrarBotonBitacora ? `<button class="btn-bitacora" onclick="abrirBitacora(${envio.id}, '${envio.codigoRastreo}')">Ver Bitacora</button>` : ''}
+                    ${puedeCambiarEstado ? `<button class="btn-transito" onclick="cambiarEstado(${envio.id}, 'EN_TRANSITO')">Marcar en Transito</button>` : ''}
+                    ${puedeCambiarEstado ? `<button class="btn-entregado" onclick="cambiarEstado(${envio.id}, 'ENTREGADO')">Marcar Entregado</button>` : ''}
+                    ${puedeVerBitacora ? `<button class="btn-bitacora" onclick="abrirBitacora(${envio.id}, '${envio.codigoRastreo}')">Ver Bitacora</button>` : ''}
                 </div>
             </article>
         `).join('');
@@ -218,21 +271,54 @@ if (enviosGrid) {
                 const datos = await respuesta.json();
 
                 if (!respuesta.ok) {
-                    throw new Error(datos.error || 'No se pudo registrar el envio.');
+                    throw new Error(extraerMensajeError(datos));
                 }
 
-                mostrarMensajeForm('Envio registrado correctamente.', 'exito');
+                mostrarMensaje(mensajeForm, 'Envio registrado correctamente.', 'exito');
                 formEnvio.reset();
                 cargarEnvios();
             } catch (error) {
-                mostrarMensajeForm(error.message, 'error');
+                mostrarMensaje(mensajeForm, error.message, 'error');
             }
         });
     }
 
-    function mostrarMensajeForm(texto, tipo) {
-        mensajeForm.textContent = texto;
-        mensajeForm.className = `mensaje-form ${tipo}`;
+    // -----------------------------------------------------------
+    // Registrar un nuevo vehiculo (POST /api/vehiculos, solo ADMIN)
+    // -----------------------------------------------------------
+    if (formVehiculo) {
+        formVehiculo.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+
+            const payload = {
+                placa: document.getElementById('placaVehiculo').value,
+                capacidadKg: parseFloat(document.getElementById('capacidadVehiculo').value)
+            };
+
+            try {
+                const respuesta = await fetchWithAuth(`${API_BASE_URL}/vehiculos`, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    throw new Error(extraerMensajeError(datos));
+                }
+
+                mostrarMensaje(mensajeVehiculo, `Vehiculo ${datos.placa} registrado.`, 'exito');
+                formVehiculo.reset();
+                cargarVehiculosActivos();
+            } catch (error) {
+                mostrarMensaje(mensajeVehiculo, error.message, 'error');
+            }
+        });
+    }
+
+    function mostrarMensaje(elemento, texto, tipo) {
+        elemento.textContent = texto;
+        elemento.className = `mensaje-form ${tipo}`;
     }
 
     // -----------------------------------------------------------
@@ -250,7 +336,7 @@ if (enviosGrid) {
             const datos = await respuesta.json();
 
             if (!respuesta.ok) {
-                throw new Error(datos.error || 'No se pudo actualizar el estado.');
+                throw new Error(extraerMensajeError(datos));
             }
 
             cargarEnvios();
@@ -294,7 +380,6 @@ if (enviosGrid) {
             entradas = entradas.filter(b => new Date(b.fechaCambio) >= desde);
         }
         if (hasta) {
-            // Incluir todo el dia "hasta"
             const hastaFin = new Date(hasta);
             hastaFin.setHours(23, 59, 59, 999);
             entradas = entradas.filter(b => new Date(b.fechaCambio) <= hastaFin);
@@ -319,39 +404,42 @@ if (enviosGrid) {
         `).join('');
     }
 
-    filtroFechaInicio.addEventListener('change', renderizarBitacora);
-    filtroFechaFin.addEventListener('change', renderizarBitacora);
+    //Event Listeners protegidos contra null
+    if (filtroFechaInicio) filtroFechaInicio.addEventListener('change', renderizarBitacora);
+    if (filtroFechaFin) filtroFechaFin.addEventListener('change', renderizarBitacora);
+    
+    if (btnLimpiarFiltroFecha) {
+        btnLimpiarFiltroFecha.addEventListener('click', () => {
+            filtroFechaInicio.value = '';
+            filtroFechaFin.value = '';
+            renderizarBitacora();
+        });
+    }
 
-    btnLimpiarFiltroFecha.addEventListener('click', () => {
-        filtroFechaInicio.value = '';
-        filtroFechaFin.value = '';
-        renderizarBitacora();
-    });
+    if (btnCerrarModal) {
+        btnCerrarModal.addEventListener('click', () => modalBitacora.classList.add('oculto'));
+    }
 
-    btnCerrarModal.addEventListener('click', () => modalBitacora.classList.add('oculto'));
-    modalBitacora.addEventListener('click', (evento) => {
-        if (evento.target === modalBitacora) modalBitacora.classList.add('oculto');
-    });
+    if (modalBitacora) {
+        modalBitacora.addEventListener('click', (evento) => {
+            if (evento.target === modalBitacora) modalBitacora.classList.add('oculto');
+        });
+    }
 
-    // -----------------------------------------------------------
-    // Filtros de estado interactivos
-    // -----------------------------------------------------------
-    filtrosLista.addEventListener('click', (evento) => {
-        const boton = evento.target.closest('.filtro-btn');
-        if (!boton) return;
+    if (filtrosLista) {
+        filtrosLista.addEventListener('click', (evento) => {
+            const boton = evento.target.closest('.filtro-btn');
+            if (!boton) return;
 
-        document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
-        boton.classList.add('activo');
+            document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('activo'));
+            boton.classList.add('activo');
 
-        filtroActual = boton.dataset.estado;
-        renderizarEnvios();
-    });
+            filtroActual = boton.dataset.estado;
+            renderizarEnvios();
+        });
+    }
 
-    // -----------------------------------------------------------
-    // Inicializacion
-    // -----------------------------------------------------------
-    document.addEventListener('DOMContentLoaded', () => {
-        inicializarInterfazSegunRol();
-        cargarEnvios();
-    });
-}
+    //Inicializacion (Ejecutar directamente)
+    inicializarInterfazSegunRol();
+    cargarEnvios();
+} //Fin del if (enviosGrid)
