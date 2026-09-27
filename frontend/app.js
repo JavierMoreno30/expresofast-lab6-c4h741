@@ -1,8 +1,6 @@
 const API_BASE_URL = 'http://localhost:8080/api';
 
-// -----------------------------------------------------------
-// Utilidades de sesion (sessionStorage: se borra al cerrar la pestaña)
-// -----------------------------------------------------------
+//Utilidades de sesion (sessionStorage: se borra al cerrar la pestaña)
 function getToken() {
     return sessionStorage.getItem('jwt_token');
 }
@@ -59,12 +57,6 @@ async function fetchWithAuth(url, options = {}) {
 
     return respuesta;
 }
-
-// -----------------------------------------------------------
-// Extrae un mensaje legible del cuerpo de error que devuelve
-// GlobalExceptionHandler: {error, detalles?} (no es RFC 7807,
-// es el formato propio definido en el Lab 6/7 de este proyecto).
-// -----------------------------------------------------------
 function extraerMensajeError(datos) {
     if (datos.detalles) {
         return Object.entries(datos.detalles)
@@ -73,10 +65,7 @@ function extraerMensajeError(datos) {
     }
     return datos.error || 'Ocurrio un error inesperado.';
 }
-
-// ===========================================================
-// LOGICA DE index.html (Login)
-// ===========================================================
+//LOGICA DE index.html (Login)
 const formLogin = document.getElementById('loginForm');
 
 if (formLogin) {
@@ -110,9 +99,7 @@ if (formLogin) {
     });
 }
 
-// ===========================================================
-// LOGICA DE dashboard.html (Consola de Operacion)
-// ===========================================================
+//LOGICA DE dashboard.html (Consola de Operacion)
 const enviosGrid = document.getElementById('enviosGrid');
 
 if (enviosGrid) {
@@ -153,12 +140,12 @@ if (enviosGrid) {
     function inicializarInterfazSegunRol() {
         usuarioActual.textContent = `${getUsername()} (${getRoles().join(', ')})`;
 
-        // Solo ADMIN y OPERADOR pueden crear envios (POST /api/envios en el backend)
+        //solo ADMIN y OPERADOR pueden crear envios (POST /api/envios en el backend)
         if (!tieneRol('ROLE_ADMIN', 'ROLE_OPERADOR')) {
             nuevoEnvioSection.hidden = true;
         }
 
-        // Solo ADMIN ve el panel lateral (bitacora + registro de vehiculos)
+        //solo ADMIN ve el panel lateral (bitacora + registro de vehiculos)
         if (tieneRol('ROLE_ADMIN')) {
             asideAdmin.hidden = false;
             cargarVehiculosActivos();
@@ -170,9 +157,7 @@ if (enviosGrid) {
 
     btnLogout.addEventListener('click', cerrarSesion);
 
-    // -----------------------------------------------------------
-    // KPIs
-    // -----------------------------------------------------------
+    //KPIs
     function actualizarKpis() {
         kpiTotalEnvios.textContent = enviosCache.length;
         kpiPaquetesEntregados.textContent = enviosCache.filter(e => e.estadoEnvio === 'ENTREGADO').length;
@@ -223,8 +208,8 @@ if (enviosGrid) {
             return;
         }
 
-        // Botones de cambio de estado: solo ADMIN y CONDUCTOR pueden
-        // ejecutar PATCH /api/envios/{id}/estado segun la matriz RBAC del backend.
+        //botones de cambio de estado: solo ADMIN y CONDUCTOR pueden
+        //ejecutar PATCH /api/envios/{id}/estado segun la matriz RBAC del backend.
         const puedeCambiarEstado = tieneRol('ROLE_ADMIN', 'ROLE_CONDUCTOR');
         const puedeVerBitacora = tieneRol('ROLE_ADMIN', 'ROLE_OPERADOR');
 
