@@ -7,10 +7,10 @@ INSERT INTO Rol (nombre_rol) VALUES
     ('ROLE_OPERADOR'),
     ('ROLE_CONDUCTOR');
 
--- Contraseña en texto plano de cada usuario (para tu README):
--- admin      / admin123   -> ROLE_ADMIN
--- operador1  / oper123    -> ROLE_OPERADOR
--- conductor1 / cond123    -> ROLE_CONDUCTOR
+--Contraseña en texto plano de cada usuario
+--admin      / admin123   -> ROLE_ADMIN
+--operador1  / oper123    -> ROLE_OPERADOR
+--conductor1 / cond123    -> ROLE_CONDUCTOR
 
 INSERT INTO Usuario (username, password_hash, nombre_completo, email, activo) VALUES
     ('admin', '$2b$10$rEnNiAQd7.0OkfoMI0f1POpCiaRyYj/mkmLzX5QUivgEjdT6TWDC6', 'Javier Moreno Sibaja', 'admin@expresofast.cr', 1),

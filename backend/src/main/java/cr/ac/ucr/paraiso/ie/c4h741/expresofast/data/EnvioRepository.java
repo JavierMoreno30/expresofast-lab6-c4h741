@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EnvioRepository extends JpaRepository<Envio, Integer> {
@@ -42,6 +43,9 @@ public interface EnvioRepository extends JpaRepository<Envio, Integer> {
 
     //paginacion relacional y Stored Procedure
 Page<Envio> findByEstadoEnvio(String estadoEnvio, Pageable pageable);
+
+
+Optional<Envio> findByCodigoRastreo(String codigoRastreo);
 
     
      //Busqueda paginada por texto libre, en codigo de rastreo o direccion destino.

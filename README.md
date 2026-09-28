@@ -52,3 +52,22 @@ mvnw.cmd clean verify
 
 Despues de ejecutar `mvn clean verify` (o `mvn clean test` seguido de `mvn jacoco:report`), abrir en el navegador:
 
+## Laboratorio 9 - Procedimientos Almacenados y Paginacion Relacional
+
+Se implemento paginacion fisica a nivel de base de datos con `Pageable`/`Page<T>` de Spring Data, y un Stored Procedure nativo en SQL Server para consultar envios por estado.
+
+### Endpoints nuevos
+
+- `GET /api/v1/envios` — paginado, acepta `page`, `size`, `sortBy`, `direction`, `busqueda`, `estado`.
+- `GET /api/v1/envios/procedimiento/{estado}` — invoca `SP_OBTENER_ENVIOS_POR_ESTADO` via `@Procedure`.
+
+### Scripts SQL
+
+Ubicados en `database/`, corridos sobre `ExpresoFast_C4H741_II2026`:
+- Creacion del procedimiento `SP_OBTENER_ENVIOS_POR_ESTADO`.
+- Semillas: 15 envios con estados variados para probar la paginacion.
+
+### Vista web
+
+`frontend/dashboard_paginado.html` — tabla paginada con filtros de busqueda, estado y tamaño de pagina, mas los controles Primera/Anterior/Siguiente/Ultima.
+

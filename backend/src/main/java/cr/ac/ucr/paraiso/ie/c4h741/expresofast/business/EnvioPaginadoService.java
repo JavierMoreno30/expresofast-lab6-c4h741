@@ -3,13 +3,15 @@ package cr.ac.ucr.paraiso.ie.c4h741.expresofast.business;
 import cr.ac.ucr.paraiso.ie.c4h741.expresofast.data.EnvioRepository;
 import cr.ac.ucr.paraiso.ie.c4h741.expresofast.domain.Envio;
 import cr.ac.ucr.paraiso.ie.c4h741.expresofast.dto.EnvioDTO;
+import cr.ac.ucr.paraiso.ie.c4h741.expresofast.exception.ResourceNotFoundException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import cr.ac.ucr.paraiso.ie.c4h741.expresofast.exception.ResourceNotFoundException;
 import java.util.List;
 
 @Service
@@ -60,5 +62,12 @@ public class EnvioPaginadoService {
                 envio.getEstadoEnvio(),
                 envio.getFechaCreacion()
         );
+    }
+        @Transactional(readOnly = true)
+    public EnvioDTO buscarPorCodigoRastreo(String codigoRastreo) {
+        Envio envio = envioRepository.findByCodigoRastreo(codigoRastreo)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No existe ningun envio con el codigo de rastreo " + codigoRastreo));
+        return toDTO(envio);
     }
 }

@@ -35,4 +35,8 @@ public class EnvioPaginadoController {
     public ResponseEntity<List<EnvioDTO>> listarViaStoredProcedure(@PathVariable String estado) {
         return ResponseEntity.ok(envioPaginadoService.listarViaStoredProcedure(estado));
     }
+        @GetMapping("/rastreo/{codigo}")
+    public ResponseEntity<EnvioDTO> buscarPorRastreo(@PathVariable String codigo) {
+        return ResponseEntity.ok(envioPaginadoService.buscarPorCodigoRastreo(codigo));
+    }
 }
