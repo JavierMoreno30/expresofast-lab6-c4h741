@@ -1,0 +1,37 @@
+<section class="envio-list">
+    <h1>Envios Registrados</h1>
+
+    <p *ngIf="cargando">Cargando envios...</p>
+    <p *ngIf="mensajeError" role="alert" class="mensaje-error">{{ mensajeError }}</p>
+
+    <table *ngIf="!cargando && envios.length > 0">
+        <thead>
+            <tr>
+                <th>Rastreo</th>
+                <th>Direccion</th>
+                <th>Flete</th>
+                <th>Estado</th>
+                <th>Cambiar Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let envio of envios">
+                <td>{{ envio.codigoRastreo }}</td>
+                <td>{{ envio.direccionDestino }}</td>
+                <td>₡{{ envio.montoFlete }}</td>
+                <td>
+                    <span class="badge" [ngClass]="'badge-' + envio.estado">{{ envio.estado }}</span>
+                </td>
+                <td>
+                    <select (change)="onCambiarEstado(envio, $event)">
+                        <option *ngFor="let estado of estadosDisponibles" [value]="estado" [selected]="estado === envio.estado">
+                            {{ estado }}
+                        </option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p *ngIf="!cargando && envios.length === 0 && !mensajeError">No hay envios registrados todavia.</p>
+</section>
