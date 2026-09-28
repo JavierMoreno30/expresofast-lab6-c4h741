@@ -1,0 +1,47 @@
+.envio-form {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    color: #f8fafc;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 1rem;
+}
+
+label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+input {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 0.55rem 0.7rem;
+    color: #f8fafc;
+}
+
+button {
+    background: #0284c7;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.65rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    cursor: pointer;
+}
+
+.mensaje-exito {
+    color: #22c55e;
+    margin-top: 1rem;
+}
+
+.mensaje-error {
+    color: #ef4444;
+    margin-top: 1rem;
+}

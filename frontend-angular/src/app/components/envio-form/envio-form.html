@@ -1,0 +1,28 @@
+<section class="envio-form">
+    <h1>Registrar Nuevo Envio</h1>
+
+    <form (ngSubmit)="onSubmit()" novalidate>
+        <label for="codigoRastreo">Codigo de Rastreo</label>
+        <input type="text" id="codigoRastreo" name="codigoRastreo" placeholder="EXP-0016" [(ngModel)]="payload.codigoRastreo" required>
+
+        <label for="direccionDestino">Direccion Destino</label>
+        <input type="text" id="direccionDestino" name="direccionDestino" placeholder="Paraiso, Cartago" [(ngModel)]="payload.direccionDestino" required>
+
+        <label for="pesoKg">Peso (kg)</label>
+        <input type="number" id="pesoKg" name="pesoKg" step="0.01" [(ngModel)]="payload.pesoKg" required>
+
+        <label for="costo">Costo / Flete (₡)</label>
+        <input type="number" id="costo" name="costo" step="0.01" [(ngModel)]="payload.costo" required>
+
+        <label for="vehiculoId">ID Vehiculo</label>
+        <input type="number" id="vehiculoId" name="vehiculoId" [(ngModel)]="payload.vehiculoId" required>
+
+        <label for="conductorId">ID Conductor</label>
+        <input type="number" id="conductorId" name="conductorId" [(ngModel)]="payload.conductorId" required>
+
+        <button type="submit">Registrar Envio</button>
+    </form>
+
+    <p *ngIf="mensajeExito" class="mensaje-exito">{{ mensajeExito }}</p>
+    <p *ngIf="mensajeError" role="alert" class="mensaje-error">{{ mensajeError }}</p>
+</section>

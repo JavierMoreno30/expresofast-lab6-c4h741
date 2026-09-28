@@ -1,0 +1,26 @@
+<section class="envio-tracking">
+    <h1>Rastrear Guia</h1>
+
+    <form (ngSubmit)="buscar()" novalidate>
+        <label for="codigo">Codigo de Rastreo</label>
+        <input type="text" id="codigo" name="codigo" placeholder="EXP-0001" [(ngModel)]="codigo" required>
+        <button type="submit">Buscar</button>
+    </form>
+
+    <p *ngIf="buscando">Buscando...</p>
+    <p *ngIf="mensajeError" role="alert" class="mensaje-error">{{ mensajeError }}</p>
+
+    <article *ngIf="envio" class="ficha">
+        <h2>{{ envio.codigoRastreo }}</h2>
+        <p><strong>Destino:</strong> {{ envio.direccionDestino }}</p>
+        <p><strong>Flete:</strong> ₡{{ envio.montoFlete }}</p>
+
+        <div class="barra-progreso" [class.cancelado]="envio.estado === 'CANCELADO'">
+            <div class="paso" [class.activo]="pasoActivo('PENDIENTE')">Pendiente</div>
+            <div class="paso" [class.activo]="pasoActivo('EN_TRANSITO')">En Transito</div>
+            <div class="paso" [class.activo]="pasoActivo('ENTREGADO')">Entregado</div>
+        </div>
+
+        <p *ngIf="envio.estado === 'CANCELADO'" class="mensaje-error">Este envio fue cancelado.</p>
+    </article>
+</section>
