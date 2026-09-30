@@ -39,33 +39,40 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(sess -> sess
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-           .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/envios/optimizados")
-                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_OPERADOR", "ROLE_CONDUCTOR")
-                .requestMatchers(HttpMethod.POST, "/api/envios")
-                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_OPERADOR")
-                .requestMatchers(HttpMethod.PATCH, "/api/envios/*/estado")
-                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_CONDUCTOR")
-                .requestMatchers(HttpMethod.GET, "/api/envios/*/bitacora")
-                    .hasAnyAuthority("ROLE_ADMIN", "ROLE_OPERADOR")
-                .requestMatchers("/api/vehiculos/**")
-                    .hasAuthority("ROLE_ADMIN")
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(sess -> sess
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/api/v1/auth/**", "/api/auth/**").permitAll()
 
-        return http.build();
-    }
+            // LISTAR Y CONSULTAR ENVÍOS (Soluciona el GET /api/v1/envios)
+            .requestMatchers(HttpMethod.GET, "/api/v1/envios", "/api/v1/envios/**")
+                .hasAnyAuthority("ROLE_ADMIN", "ROLE_OPERADOR", "ROLE_CONDUCTOR")
+
+            .requestMatchers(HttpMethod.POST, "/api/v1/envios")
+                .hasAnyAuthority("ROLE_ADMIN", "ROLE_OPERADOR")
+
+            .requestMatchers(HttpMethod.PATCH, "/api/v1/envios/*/estado")
+                .hasAnyAuthority("ROLE_ADMIN", "ROLE_CONDUCTOR")
+
+            .requestMatchers(HttpMethod.GET, "/api/v1/envios/*/bitacora")
+                .hasAnyAuthority("ROLE_ADMIN", "ROLE_OPERADOR")
+
+            .requestMatchers("/api/v1/vehiculos/**")
+                .hasAuthority("ROLE_ADMIN")
+
+            .anyRequest().authenticated()
+        )
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
