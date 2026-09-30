@@ -71,3 +71,42 @@ Ubicados en `database/`, corridos sobre `ExpresoFast_C4H741_II2026`:
 
 `frontend/dashboard_paginado.html` — tabla paginada con filtros de busqueda, estado y tamaño de pagina, mas los controles Primera/Anterior/Siguiente/Ultima.
 
+## Laboratorio 10 - Frontend Angular Standalone
+
+Migracion del cliente web de ExpresoFast a una SPA en Angular Standalone (`frontend-angular/`) que consume la API RESTful de Spring Boot (`backend/`).
+
+### Requisitos
+
+- Java 21 y Maven (se usa el wrapper `mvnw`)
+- Node.js 18+ y Angular CLI (`npm install -g @angular/cli`)
+- SQL Server con la base `ExpresoFast_C4H741_II2026` (scripts en `database/`)
+
+### Ejecutar el backend
+
+```bash
+cd backend
+mvnw.cmd spring-boot:run
+```
+
+La API queda en `http://localhost:8080/api/v1/`.
+
+### Ejecutar el frontend
+
+```bash
+cd frontend-angular
+npm install
+ng serve
+```
+
+La aplicacion queda en `http://localhost:4200`.
+
+### Vistas
+
+- `/envios`: tabla de envios con insignias de estado y selector para cambiar el estado.
+- `/nuevo-envio`: formulario de registro de envios.
+- `/rastreo`: busqueda por codigo de rastreo con barra de progreso.
+
+### Credenciales de prueba
+
+- Usuario: `<admin>`
+- Contrasena: `<admin123>`
