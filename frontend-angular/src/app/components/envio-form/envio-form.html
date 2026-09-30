@@ -23,6 +23,6 @@
         <button type="submit">Registrar Envio</button>
     </form>
 
-    <p *ngIf="mensajeExito" class="mensaje-exito">{{ mensajeExito }}</p>
-    <p *ngIf="mensajeError" role="alert" class="mensaje-error">{{ mensajeError }}</p>
+        <p *ngIf="mensajeExito()" class="mensaje-exito">{{ mensajeExito() }}</p>
+    <p *ngIf="mensajeError()" role="alert" class="mensaje-error">{{ mensajeError() }}</p>
 </section>

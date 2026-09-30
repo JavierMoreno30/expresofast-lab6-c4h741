@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EnvioService } from '../../services/envio.service';
@@ -14,35 +14,36 @@ export class EnvioTracking {
   private envioService = inject(EnvioService);
 
   codigo = '';
-  envio: Envio | null = null;
-  mensajeError = '';
-  buscando = false;
+  envio = signal<Envio | null>(null);
+  mensajeError = signal('');
+  buscando = signal(false);
 
   readonly pasos = ['PENDIENTE', 'EN_TRANSITO', 'ENTREGADO'];
 
   buscar(): void {
-    this.mensajeError = '';
-    this.envio = null;
+    this.mensajeError.set('');
+    this.envio.set(null);
     if (!this.codigo.trim()) {
       return;
     }
 
-    this.buscando = true;
+    this.buscando.set(true);
     this.envioService.obtenerPorRastreo(this.codigo.trim()).subscribe({
       next: (envio) => {
-        this.envio = envio;
-        this.buscando = false;
+        this.envio.set(envio);
+        this.buscando.set(false);
       },
       error: () => {
-        this.mensajeError = `No se encontro ningun envio con el codigo ${this.codigo}.`;
-        this.buscando = false;
+        this.mensajeError.set(`No se encontro ningun envio con el codigo ${this.codigo}.`);
+        this.buscando.set(false);
       }
     });
   }
 
   pasoActivo(paso: string): boolean {
-    if (!this.envio) return false;
-    if (this.envio.estado === 'CANCELADO') return false;
-    return this.pasos.indexOf(paso) <= this.pasos.indexOf(this.envio.estado);
+    const envio = this.envio();
+    if (!envio) return false;
+    if (envio.estado === 'CANCELADO') return false;
+    return this.pasos.indexOf(paso) <= this.pasos.indexOf(envio.estado);
   }
 }

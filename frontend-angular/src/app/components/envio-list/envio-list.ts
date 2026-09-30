@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EnvioService } from '../../services/envio.service';
 import { Envio } from '../../models/envio.model';
@@ -12,9 +12,9 @@ import { Envio } from '../../models/envio.model';
 export class EnvioList implements OnInit {
   private envioService = inject(EnvioService);
 
-  envios: Envio[] = [];
-  cargando = true;
-  mensajeError = '';
+  envios = signal<Envio[]>([]);
+  cargando = signal(true);
+  mensajeError = signal('');
 
   readonly estadosDisponibles = ['PENDIENTE', 'EN_TRANSITO', 'ENTREGADO', 'CANCELADO'];
 
@@ -23,15 +23,16 @@ export class EnvioList implements OnInit {
   }
 
   cargarEnvios(): void {
-    this.cargando = true;
+    this.cargando.set(true);
+    this.mensajeError.set('');
     this.envioService.obtenerEnvios().subscribe({
       next: (respuesta) => {
-        this.envios = respuesta.content;
-        this.cargando = false;
+        this.envios.set(respuesta.content);
+        this.cargando.set(false);
       },
       error: () => {
-        this.mensajeError = 'No se pudieron cargar los envios.';
-        this.cargando = false;
+        this.mensajeError.set('No se pudieron cargar los envios.');
+        this.cargando.set(false);
       }
     });
   }

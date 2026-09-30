@@ -7,20 +7,20 @@
         <button type="submit">Buscar</button>
     </form>
 
-    <p *ngIf="buscando">Buscando...</p>
-    <p *ngIf="mensajeError" role="alert" class="mensaje-error">{{ mensajeError }}</p>
+        <p *ngIf="buscando()">Buscando...</p>
+    <p *ngIf="mensajeError()" role="alert" class="mensaje-error">{{ mensajeError() }}</p>
 
-    <article *ngIf="envio" class="ficha">
-        <h2>{{ envio.codigoRastreo }}</h2>
-        <p><strong>Destino:</strong> {{ envio.direccionDestino }}</p>
-        <p><strong>Flete:</strong> ₡{{ envio.montoFlete }}</p>
+    <article *ngIf="envio() as e" class="ficha">
+        <h2>{{ e.codigoRastreo }}</h2>
+        <p><strong>Destino:</strong> {{ e.direccionDestino }}</p>
+        <p><strong>Flete:</strong> ₡{{ e.montoFlete }}</p>
 
-        <div class="barra-progreso" [class.cancelado]="envio.estado === 'CANCELADO'">
+        <div class="barra-progreso" [class.cancelado]="e.estado === 'CANCELADO'">
             <div class="paso" [class.activo]="pasoActivo('PENDIENTE')">Pendiente</div>
             <div class="paso" [class.activo]="pasoActivo('EN_TRANSITO')">En Transito</div>
             <div class="paso" [class.activo]="pasoActivo('ENTREGADO')">Entregado</div>
         </div>
 
-        <p *ngIf="envio.estado === 'CANCELADO'" class="mensaje-error">Este envio fue cancelado.</p>
+        <p *ngIf="e.estado === 'CANCELADO'" class="mensaje-error">Este envio fue cancelado.</p>
     </article>
 </section>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -15,17 +15,17 @@ export class Login {
 
   username = '';
   password = '';
-  mensajeError = '';
+  mensajeError = signal('');
 
   onSubmit(): void {
-    this.mensajeError = '';
+    this.mensajeError.set('');
     this.authService.login(this.username, this.password).subscribe({
       next: (respuesta) => {
         this.authService.guardarSesion(respuesta);
         this.router.navigate(['/envios']);
       },
       error: () => {
-        this.mensajeError = 'Usuario o contraseña incorrectos.';
+        this.mensajeError.set('Usuario o contraseña incorrectos.');
       }
     });
   }
