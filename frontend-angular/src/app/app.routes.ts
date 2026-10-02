@@ -3,11 +3,13 @@ import { Login } from './components/login/login';
 import { EnvioList } from './components/envio-list/envio-list';
 import { EnvioForm } from './components/envio-form/envio-form';
 import { EnvioTracking } from './components/envio-tracking/envio-tracking';
+import { EnvioAvanzadoForm } from './components/envio-avanzado-form/envio-avanzado-form';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'envios', component: EnvioList },
     { path: 'nuevo-envio', component: EnvioForm },
+    { path: 'nuevo-envio-avanzado', component: EnvioAvanzadoForm },
     { path: 'rastreo', component: EnvioTracking },
     { path: '', redirectTo: '/envios', pathMatch: 'full' },
     { path: '**', redirectTo: '/envios' }

@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
+import { CambioEstadoPayload, CrearEnvioConPaquetesPayload, CrearEnvioPayload, Envio, EnvioCreado } from '../models/envio.model';
 import { environment } from '../../environments/environment';
-import { CambioEstadoPayload, CrearEnvioPayload, Envio } from '../models/envio.model';
 
 @Injectable({ providedIn: 'root' })
 export class EnvioService {
@@ -27,5 +27,16 @@ export class EnvioService {
 
     actualizarEstado(id: number, payload: CambioEstadoPayload): Observable<Envio> {
         return this.http.patch<Envio>(`http://localhost:8080/api/envios/${id}/estado`, payload);
+    }
+        private readonly apiEnvios = 'http://localhost:8080/api/envios';
+
+    crearConPaquetes(payload: CrearEnvioConPaquetesPayload): Observable<EnvioCreado> {
+        return this.http.post<EnvioCreado>(`${this.apiEnvios}/con-paquetes`, payload);
+    }
+
+    existeTracking(codigo: string): Observable<boolean> {
+        return this.http
+            .get<{ existe: boolean }>(`${this.apiEnvios}/check-tracking/${encodeURIComponent(codigo)}`)
+            .pipe(map((resp) => resp.existe));
     }
 }

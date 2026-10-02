@@ -1,0 +1,10 @@
+.paquete {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.paquete > div {
+  flex: 1;
+}
