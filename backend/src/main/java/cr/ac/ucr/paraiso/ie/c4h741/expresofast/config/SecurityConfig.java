@@ -67,6 +67,9 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             .requestMatchers("/api/v1/vehiculos/**")
                 .hasAuthority("ROLE_ADMIN")
 
+                            .requestMatchers(HttpMethod.POST, "/api/envios/con-paquetes")
+                .hasAnyAuthority("ROLE_ADMIN", "ROLE_OPERADOR")
+
             .anyRequest().authenticated()
         )
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

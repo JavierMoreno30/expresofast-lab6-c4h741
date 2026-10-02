@@ -44,6 +44,7 @@ public interface EnvioRepository extends JpaRepository<Envio, Integer> {
     //paginacion relacional y Stored Procedure
 Page<Envio> findByEstadoEnvio(String estadoEnvio, Pageable pageable);
 
+boolean existsByCodigoRastreo(String codigoRastreo);
 
 Optional<Envio> findByCodigoRastreo(String codigoRastreo);
 

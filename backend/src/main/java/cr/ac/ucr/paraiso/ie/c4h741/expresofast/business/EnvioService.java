@@ -24,6 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
+import cr.ac.ucr.paraiso.ie.c4h741.expresofast.domain.Paquete;
+import cr.ac.ucr.paraiso.ie.c4h741.expresofast.dto.EnvioRegistroDTO;
+import cr.ac.ucr.paraiso.ie.c4h741.expresofast.dto.PaqueteDTO;
+import java.math.BigDecimal;
+
 @Service
 public class EnvioService {
 
@@ -233,5 +238,57 @@ public class EnvioService {
             throw new NegocioException("La distancia no puede ser negativa.");
         }
         return (pesoKg * TARIFA_POR_KG) + (distanciaKm * TARIFA_POR_KM) + TARIFA_BASE;
+    }
+        @Transactional(readOnly = true)
+    public boolean existeCodigoRastreo(String codigoRastreo) {
+        return envioRepository.existsByCodigoRastreo(codigoRastreo);
+    }
+
+    @Transactional
+    public EnvioResponseDTO crearConPaquetes(EnvioRegistroDTO request) {
+        // El validador asíncrono del front es solo UX; la regla real se valida aquí
+        if (envioRepository.existsByCodigoRastreo(request.codigoRastreo())) {
+            throw new NegocioException("Este número de rastreo ya está en uso.");
+        }
+        if (!request.fechaEntregaEstimada().isAfter(request.fechaDespacho())) {
+            throw new NegocioException(
+                    "La fecha de entrega estimada debe ser posterior a la fecha de despacho.");
+        }
+
+        Vehiculo vehiculo = vehiculoRepository.findById(request.vehiculoId())
+                .orElseThrow(() -> new NegocioException("El vehiculo indicado no existe."));
+        Conductor conductor = conductorRepository.findById(request.conductorId())
+                .orElseThrow(() -> new NegocioException("El conductor indicado no existe."));
+
+        BigDecimal pesoTotal = request.paquetes().stream()
+                .map(PaqueteDTO::pesoKg)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (vehiculo.getCapacidadKg() == null || pesoTotal.compareTo(vehiculo.getCapacidadKg()) > 0) {
+            throw new NegocioException(
+                    "El peso total del envio (" + pesoTotal + " kg) supera la capacidad del vehiculo "
+                            + vehiculo.getPlaca() + " (" + vehiculo.getCapacidadKg() + " kg).");
+        }
+
+        Envio envio = new Envio();
+        envio.setCodigoRastreo(request.codigoRastreo());
+        envio.setDireccionDestino(request.direccionDestino());
+        envio.setPesoKg(pesoTotal);
+        envio.setCosto(request.costo());
+        envio.setVehiculo(vehiculo);
+        envio.setConductor(conductor);
+        envio.setEstadoEnvio("PENDIENTE");
+        envio.setFechaDespacho(request.fechaDespacho());
+        envio.setFechaEntregaEstimada(request.fechaEntregaEstimada());
+
+        for (PaqueteDTO p : request.paquetes()) {
+            Paquete paquete = new Paquete();
+            paquete.setDescripcion(p.descripcion());
+            paquete.setPesoKg(p.pesoKg());
+            envio.agregarPaquete(paquete);
+        }
+
+        // El cascade guarda los paquetes junto con el envío, en la misma transacción
+        return toResponseDTO(envioRepository.save(envio));
     }
 }
