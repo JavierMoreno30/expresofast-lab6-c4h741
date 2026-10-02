@@ -110,3 +110,23 @@ La aplicacion queda en `http://localhost:4200`.
 
 - Usuario: `<admin>`
 - Contrasena: `<admin123>`
+
+## Laboratorio 11 - Formularios Reactivos Avanzados y Consolidación Full-Stack
+
+Se agregó la relación 1:N entre `Envio` y `Paquete` (SQL Server + JPA) y un formulario reactivo tipado en Angular (`/nuevo-envio-avanzado`) que registra un envío con varios paquetes en una sola transacción.
+
+### Pregunta 1: UX y escalabilidad de FormArray
+
+Un `FormArray` te deja crear y quitar controles en tiempo de ejecución, así que el formulario muestra solo los paquetes que el operador realmente necesita. Con 10 campos estáticos ocultos pasa lo contrario: el DOM carga los 10 bloques aunque se usen 2, hay que programar a mano cuándo mostrar o esconder cada uno, y el límite de 10 queda pegado en el HTML.
+
+Para el operador, agregar o quitar un paquete es un clic, sin tope artificial. Cada control lleva su propio estado (`touched`, `dirty`, errores), entonces el mensaje de error sale solo en el campo que falló. Además, la validez del `FormArray` se suma sola a la del `FormGroup` padre: si un paquete es inválido, `form.invalid` pasa a `true` y el botón de envío se deshabilita sin escribir nada extra.
+
+En mantenimiento también gana. La estructura de un paquete se define una sola vez en `crearPaquete()` y se reutiliza dentro de un `@for`, así que si hay que cambiar una regla, como el peso máximo, se toca un solo lugar y no 10 copias del HTML. Con campos estáticos, encima, tendría que armar el arreglo del payload a mano (`paquete1`, `paquete2`, ...), mientras que con el `FormArray`, `getRawValue()` devuelve directamente la lista que espera el `EnvioRegistroDTO`. Y como el formulario es tipado (`FormControl<number>`), TypeScript avisa en compilación si se intenta meter un string en el peso.
+
+### Pregunta 2: Event Loop, validador síncrono vs asíncrono
+
+JavaScript corre en un solo hilo con una pila de llamadas (call stack). El validador cruzado de fechas es síncrono: se ejecuta dentro de esa misma pila, justo cuando Angular recalcula la validez después de un cambio. Solo compara dos fechas que ya están en memoria y devuelve `null` o `{ fechasInvalidas: true }` al instante, así que cuando la función termina el estado del formulario ya quedó calculado.
+
+El validador de tracking no puede hacer eso, porque tiene que saber si el código existe en la base de datos y esa respuesta depende de la red. Si se quedara esperando con la pila bloqueada, el hilo único se congelaría y la interfaz dejaría de responder. Lo que pasa en realidad es que la petición HTTP se le delega a una API del navegador (Web API) y la pila queda libre. Cuando llega la respuesta, su callback entra a la cola de tareas y el Event Loop lo ejecuta apenas la pila esté vacía. El `timer(400)` del validador funciona igual: es un `setTimeout` que se encola como macrotarea y de paso sirve de debounce.
+
+Por eso el validador asíncrono tiene que retornar un `Observable` o una `Promise`. La función debe devolver algo en el momento y, como el resultado todavía no existe, devuelve un "contenedor" del valor futuro. Mientras tanto Angular marca el control como `PENDING` y se suscribe; cuando el `Observable` emite, actualiza los errores y pasa el estado a `VALID` o `INVALID`. Si el usuario sigue escribiendo, Angular cancela la suscripción anterior y descarta la respuesta vieja. Eso sí, el `Observable` tiene que completarse para que Angular tome el resultado, y los validadores asíncronos solo corren si los síncronos del mismo campo ya pasaron.
